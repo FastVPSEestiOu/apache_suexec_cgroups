@@ -3,7 +3,7 @@ apache_suexec_cgroups
 
 Author: Pavel Odintsov, pavel.odintsov [at] gmail.com
 
-Patch for adding cgroups support to Apache suexec
+Patch for adding cgroups support to Apache suexec (you can add cgi/mod_fcgid/mod_fastcgi processes into separate cgroups)
 
 # Build suexec module on Debian Lenny
 
