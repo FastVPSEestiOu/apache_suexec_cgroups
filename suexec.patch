@@ -1,0 +1,59 @@
+diff -rupN apache2-2.2.9_orig/support/suexec.c apache2-2.2.9/support/suexec.c
+--- apache2-2.2.9_orig/support/suexec.c	2010-01-31 20:28:51.000000000 +0300
++++ apache2-2.2.9/support/suexec.c	2010-01-31 20:34:10.000000000 +0300
+@@ -439,14 +439,34 @@ int main(int argc, char *argv[])
+     actual_uname = strdup(pw->pw_name);
+     target_homedir = strdup(pw->pw_dir);
+ 
++    /* patch start */
++
++    char cgroup_path[128];
++    sprintf(cgroup_path, "/mnt/cgroup/%s/tasks", actual_gname);
++    
++
+     /*
+      * Log the transaction here to be sure we have an open log
+      * before we setuid().
+      */
++
++    /* old version
+     log_no_err("uid: (%s/%s) gid: (%s/%s) cmd: %s\n",
+                target_uname, actual_uname,
+                target_gname, actual_gname,
+                cmd);
++    */
++
++    /* patched version */
++    log_no_err("pid: %d uid: (%s/%s) gid: (%s/%s) cmd: %s cgroup_path: %s\n",
++        getpid(),
++        target_uname, actual_uname,
++        target_gname, actual_gname,
++        cmd,
++        cgroup_path
++    );
++
++    /* patch end */
+ 
+     /*
+      * Error out if attempt is made to execute as root or as
+@@ -466,6 +486,20 @@ int main(int argc, char *argv[])
+         exit(108);
+     }
+ 
++    /* patch start */
++
++    FILE* cgroup_tasks = fopen(cgroup_path, "w");
++    
++    if (cgroup_tasks) {
++        fprintf(cgroup_tasks, "%d\n", getpid());
++        
++        fclose(cgroup_tasks);
++    } else {
++        log_err("failed to open cgroup %s\n", cgroup_path);
++    }
++
++    /* patch end */
++
+     /*
+      * Change UID/GID here so that the following tests work over NFS.
+      *
