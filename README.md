@@ -26,7 +26,7 @@ dpkg-source -x apache2_2.2.9-10+lenny12.dsc
 cd apache2-2.2.9
 
 # get patch
-wget http://download.fastvps.ru/dist/suexec.patch
+wget http://...../suexec.patch
 
 # patch
 patch -p1 < suexec.patch
