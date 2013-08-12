@@ -5,11 +5,9 @@ Author: Pavel Odintsov, pavel.odintsov [at] gmail.com
 
 Patch for adding cgroups support to Apache suexec (you can add cgi/mod_fcgid/mod_fastcgi processes into separate cgroups)
 
-# Build suexec module on Debian Lenny
+# Build suexec module on Debian Squeeze 
 
 ```bash
-#!/bin/bash
-
 # build tools
 apt-get install -y dpkg-dev devscripts build-essential fakeroot
 
@@ -19,16 +17,12 @@ apt-get build-dep apache2-suexec
 # get sources
 cd /usr/src
 
-# old method, is buggy: http://phpsuxx.blogspot.com/2010/12/source-apache2-debian.html
-#apt-get source apache2-suexec
-wget http://ftp.de.debian.org/debian/pool/main/a/apache2/apache2_2.2.9-10+lenny12.dsc
-wget http://ftp.de.debian.org/debian/pool/main/a/apache2/apache2_2.2.9.orig.tar.gz
-wget http://ftp.de.debian.org/debian/pool/main/a/apache2/apache2_2.2.9-10+lenny12.diff.gz
-dpkg-source -x apache2_2.2.9-10+lenny12.dsc
-cd apache2-2.2.9
+apt-get source apache2-suexec
+dpkg-source -x apache2_2.2.16-6+squeeze11.dsc
+cd apache2-2.2.16
 
 # get patch
-wget http://...../suexec.patch
+wget https://raw.github.com/FastVPSEestiOu/apache_suexec_cgroups/master/suexec.patch
 
 # patch
 patch -p1 < suexec.patch
@@ -37,4 +31,12 @@ patch -p1 < suexec.patch
 debuild -us -uc # -us unsigned source, -uc unsigned changes
 
 cd ..
+dpkg -i apache2-suexec_2.2.16-6+squeeze11_amd64.deb
 ```
+
+After that, you need create cgroups (memory, cpu, blkio) in this path (sorry, it hardcoded):
+```bash
+/mnt/cgroup/%username%/tasks
+```
+
+Viva la cgroups! 
